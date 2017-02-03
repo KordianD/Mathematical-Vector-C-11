@@ -13,8 +13,8 @@ public:
     Vector(int size, T value);
     Vector(const std::initializer_list<T> & v);
 
-    Vector(const Vector<DT> & v);
-    Vector(Vector<DT> && v);
+    Vector(const Vector<T> & v);
+    Vector(Vector<T> && v);
 
     Vector & operator=(const Vector<T> & v);
     Vector & operator=(Vector<T> && v);
@@ -24,50 +24,47 @@ public:
     void swap(Vector<T> & other) noexcept;
 
     Vector operator+(const Vector<T> & v) const;
-    //Vector operator+(T & v) const;
-    //Vector<T> operator+() const;
+    Vector operator+(T v) const;
+    Vector<T> operator+() const;
 
-    //Vector & operator+=(const Vector<T> & v);
-    //Vector & operator+=(T & v);
+    Vector & operator+=(const Vector<T> & v);
+    Vector & operator+=(T v);
 
-    //Vector operator-(const Vector<T> & v) const;
-    //Vector operator-(T & v) const;
-    //Vector<T> operator-() const
+    Vector operator-(const Vector<T> & v) const;
+    Vector operator-(T v) const;
+    Vector<T> operator-() const;
 
-    //Vector & operator-=(const Vector<T> & v);
-    //Vector & operator-=(T & v);
+    Vector & operator-=(const Vector<T> & v);
+    Vector & operator-=(T v);
 
-    //auto operator*(const Vector<T> & v) const -> decltype(x)
-    //Vector operator*(T & v);
+    T operator*(const Vector<T> & v) const;
+    Vector operator*(T v) const;
 
+    Vector & operator *=(T t);
 
-    //Vector & operator =*(T & t);
+    Vector operator/(T v) const;
 
-    //Vector operator/(T & v);
+    Vector & operator/=(T v);
 
-    //Vector & operator/=(T & v);
+    bool operator==(const Vector<T> & v) const;
+    bool operator!=(const Vector<T> & v) const;
 
-    //bool operator!=(const Vector<T> & v) const;
-    //bool operator==(const Iterator<T> & v) const;
+    bool operator>(const Vector<T> & v) const;
+    bool operator>=(const Vector<T> & v) const;
+    bool operator<(const Vector<T> & v) const;
+    bool operator<=(const Vector<T> & v) const;
 
-    //bool operator>(const Vector<T> & v) const;
-    //bool operator>=(const Vector<T> & v) const;
-    //bool operator<(const Vector<T> & v) const;
-    //bool operator<=(const Vector<T> & v) const;
+    auto length() const;
 
-    //auto length(const Vector<T> & c) -> decltype(x)
+    int size() const;
 
-    //int size() const;
+    T min() const;
+    T max() const;
 
-    // T min() const;
-    // T max() const;
+    T & operator[](int pos);
+    const T &  operator[](int pos) const;
 
-    //T   operator[]( std::size_t pos ) const;
-    //const T &    operator[]( std::size_t pos ) const;
-   // T &     operator[]( std::size_t pos );
-
-
-
+    Vector abs(const Vector<T> & v);
 };
 
 template<typename T>
@@ -90,13 +87,13 @@ Vector<T>::Vector(const std::initializer_list<T> & v) : storage(new T[v.size()])
 
 template<typename T>
 Vector<T>::Vector(const Vector<T> & v) : _size(v._size),
-                                         storage(!v._size ? nullptr :  new T[v.size]) {
+                                         storage(!v._size ? nullptr :  new T[v._size]) {
     std::copy(v.storage, v.storage + _size, storage);
 }
 
 template<typename T>
 Vector<T>::Vector(Vector<T> && v) : Vector(){
-    swap(*this, v);
+    this->swap(v);
 }
 
 template<typename T>
@@ -119,11 +116,225 @@ Vector<T>::~Vector() {
 
 template<typename T>
 void Vector<T>::swap(Vector<T> & other) noexcept {
-    std::swap(storage, other.m);
-    std::swap(_size, other.s);
+    std::swap(storage, other.storage);
+    std::swap(_size, other._size);
+}
+
+template<typename T>
+Vector<T> Vector<T>::operator+(const Vector<T> & v) const{
+    Vector<T> temp(_size);
+    for (int i = 0; i < _size; i++)
+        temp.storage[i] = storage[i] + v.storage[i];
+
+    return temp;
+}
+
+template<typename T>
+Vector<T> Vector<T>::operator+(T v) const{
+    Vector<T> temp(_size);
+    for (int i = 0; i < _size; i++)
+        temp.storage[i] = storage[i] + v;
+
+    return temp;
+}
+
+template<typename T>
+Vector<T> Vector<T>::operator+() const{
+    Vector temp(*this);
+    return temp;
+}
+
+template<typename T>
+Vector<T> & Vector<T>::operator+=(const Vector<T> & v){
+    for (int i = 0; i < _size; i++)
+        storage[i] += v.storage[i];
+
+    return *this;
+}
+
+template<typename T>
+Vector<T> & Vector<T>::operator+=(T v){
+    for (int i = 0; i < _size; i++)
+        storage[i] += v;
+
+    return *this;
+}
+
+template<typename T>
+Vector<T> Vector<T>::operator-(const Vector<T> & v) const{
+    Vector<T> temp(_size);
+    for (int i = 0; i < _size; i++)
+        temp.storage[i] = storage[i] - v.storage[i];
+
+    return temp;
+}
+
+template<typename T>
+Vector<T> Vector<T>::operator-(T v) const{
+    Vector<T> temp(_size);
+    for (int i = 0; i < _size; i++)
+        temp.storage[i] = storage[i] - v;
+
+    return temp;
+}
+
+template<typename T>
+Vector<T> Vector<T>::operator-() const{
+    Vector<T> temp(_size);
+    for(int i = 0; i < _size; i++)
+        temp.storage[i] = -storage[i];
+
+    return temp;
+}
+
+template<typename T>
+Vector<T> & Vector<T>::operator-=(const Vector<T> & v){
+    for(int i = 0; i < _size; i++)
+        storage[i] -= v.storage[i];
+
+    return *this;
+}
+
+template<typename T>
+Vector<T> & Vector<T>::operator-=(T v){
+    for (int i = 0; i < _size; i++)
+        storage[i] -= v;
+
+    return *this;
+}
+
+template<typename T>
+T Vector<T>::operator*(const Vector<T> & v) const{
+    T result = 0;
+    for (int i = 0; i < _size; i++)
+        result += storage[i] * v.storage[i];
+
+    return result;
+}
+template<typename T>
+Vector<T> Vector<T>::operator*(T v) const {
+    Vector<T> temp(_size);
+    for(int i = 0; i < _size; i++)
+        temp.storage[i] = storage[i] * v;
+
+    return temp;
+}
+
+template<typename T>
+Vector<T> & Vector<T>::operator *=(T t){
+    for(int i = 0; i < _size; i++)
+        storage[i] *= t;
+
+    return *this;
+}
+
+template<typename T>
+Vector<T> Vector<T>::operator/(T v) const{
+    Vector<T> temp;
+    for (int i = 0; i < _size; i++)
+        storage[i] = storage[i] / v;
+
+    return temp;
+}
+
+template<typename T>
+Vector<T> & Vector<T>::operator/=(T v){
+    for (int i = 0; i < _size; i++)
+        storage[i] /= v;
+
+    return *this;
+}
+
+template<typename T>
+bool Vector<T>::operator==(const Vector<T> & v) const{
+    if (_size != v._size)
+        return false;
+
+    for (int i = 0; i < _size; i++)
+        if(storage[i] != v.storage[i])
+            return false;
+
+    return true;
+}
+
+template<typename T>
+bool Vector<T>::operator!=(const Vector<T> & v) const{
+    return !(*this == v);
 }
 
 
+template<typename T>
+bool Vector<T>::operator>(const Vector<T> & v) const{
+    return this->length() > v.length();
+}
 
+template<typename T>
+bool Vector<T>::operator>=(const Vector<T> & v) const{
+    return this->length() >= v.length();
+}
+
+template<typename T>
+bool Vector<T>::operator<(const Vector<T> & v) const{
+        return *this >= v;
+}
+
+template<typename T>
+bool Vector<T>::operator<=(const Vector<T> & v) const{
+        return !(*this > v);
+}
+
+template<typename T>
+auto Vector<T>::length() const{
+    auto result = 0;
+    for (int i = 0; i < _size; i++)
+        result += storage[i] * storage[i];
+
+    result = sqrt(result);
+    return result;
+}
+
+template<typename T>
+int Vector<T>::size() const{
+    return _size;
+}
+
+template<typename T>
+T Vector<T>::min() const{
+    T temp = storage[0];
+    for (int i = 1; i < _size; i++)
+        if (storage[i] < temp)
+            temp = storage[i];
+
+    return temp;
+}
+
+template<typename T>
+T Vector<T>::max() const{
+    T temp = storage[0];
+    for (int i = 1; i < _size; i++)
+        if (storage[i] > temp)
+            temp = storage[i];
+
+    return temp;
+}
+
+template<typename T>
+const T &  Vector<T>::operator[](int pos) const{
+    return storage[pos];
+}
+
+template<typename T>
+T & Vector<T>::operator[](int pos){
+    return storage[pos];
+}
+
+template<typename T>
+Vector<T> Vector<T>::abs(const Vector<T> & v){
+    Vector<T> temp(_size);
+    for (int i = 0; i < _size; i++)
+        temp.storage[i] = abs(storage[i]);
+
+    return temp;
+}
 
 #endif //MATHEMATICAL_VECTOR_VECTOR_H
