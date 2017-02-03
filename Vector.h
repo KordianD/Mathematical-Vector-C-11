@@ -1,6 +1,8 @@
 #ifndef MATHEMATICAL_VECTOR_VECTOR_H
 #define MATHEMATICAL_VECTOR_VECTOR_H
 
+#include "Iterator.h"
+#include <cmath>
 
 template<typename T>
 class Vector{
@@ -55,7 +57,6 @@ public:
     bool operator<=(const Vector<T> & v) const;
 
     auto length() const;
-
     int size() const;
 
     T min() const;
@@ -64,7 +65,11 @@ public:
     T & operator[](int pos);
     const T &  operator[](int pos) const;
 
-    Vector abs(const Vector<T> & v);
+    Vector abs();
+
+    friend class Iterator<T>;
+    Iterator<T> end();
+    Iterator<T> begin();
 };
 
 template<typename T>
@@ -221,7 +226,7 @@ Vector<T> Vector<T>::operator*(T v) const {
 }
 
 template<typename T>
-Vector<T> & Vector<T>::operator *=(T t){
+Vector<T> & Vector<T>::operator*=(T t){
     for(int i = 0; i < _size; i++)
         storage[i] *= t;
 
@@ -230,9 +235,9 @@ Vector<T> & Vector<T>::operator *=(T t){
 
 template<typename T>
 Vector<T> Vector<T>::operator/(T v) const{
-    Vector<T> temp;
+    Vector<T> temp(_size);
     for (int i = 0; i < _size; i++)
-        storage[i] = storage[i] / v;
+        temp.storage[i] = storage[i] / v;
 
     return temp;
 }
@@ -285,12 +290,12 @@ bool Vector<T>::operator<=(const Vector<T> & v) const{
 
 template<typename T>
 auto Vector<T>::length() const{
-    auto result = 0;
+    auto temp = 0;
     for (int i = 0; i < _size; i++)
-        result += storage[i] * storage[i];
+        temp += storage[i] * storage[i];
 
-    result = sqrt(result);
-    return result;
+    auto result = sqrt(temp);
+    return  result;
 }
 
 template<typename T>
@@ -329,12 +334,39 @@ T & Vector<T>::operator[](int pos){
 }
 
 template<typename T>
-Vector<T> Vector<T>::abs(const Vector<T> & v){
+Vector<T> Vector<T>::abs(){
     Vector<T> temp(_size);
     for (int i = 0; i < _size; i++)
-        temp.storage[i] = abs(storage[i]);
+        temp.storage[i] = ::abs(storage[i]);
 
     return temp;
+}
+
+template<typename T>
+Iterator<T> Vector<T>::end(){
+    Iterator<T> temp(storage + _size);
+    return temp;
+}
+
+template<typename T>
+Iterator<T> Vector<T>::begin(){
+    Iterator<T> temp(storage);
+    return temp;
+}
+
+template<typename T>
+Vector<T> operator+(T t, const Vector<T> & v ){
+    return v + t;
+}
+
+template<typename T>
+Vector<T> operator-(T t, const Vector<T> & v){
+    return -(v - t);
+}
+
+template<typename T>
+Vector<T> operator*(T t, const Vector<T> & v){
+    return v * t;
 }
 
 #endif //MATHEMATICAL_VECTOR_VECTOR_H
